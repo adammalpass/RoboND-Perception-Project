@@ -53,6 +53,8 @@ def pcl_callback(pcl_msg):
 
     # TODO: Convert ROS msg to PCL data
     cloud = ros_to_pcl(pcl_msg)
+    
+    # TODO: Statistical Outlier Filtering
 
     # TODO: Voxel Grid Downsampling
     vox = cloud.make_voxel_grid_filter()
