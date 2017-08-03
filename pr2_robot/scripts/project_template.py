@@ -52,8 +52,10 @@ def pcl_callback(pcl_msg):
 # Exercise-2 TODOs:
 
     # TODO: Convert ROS msg to PCL data
+    cloud = ros_to_pcl(pcl_msg)
 
     # TODO: Voxel Grid Downsampling
+    vox = cloud.make_voxel_grid_filter()
 
     # TODO: PassThrough Filter
 
@@ -135,14 +137,24 @@ def pr2_mover(object_list):
 if __name__ == '__main__':
 
     # TODO: ROS node initialization
+    rospy.init_node('object_recognition', anonymous=True)
 
     # TODO: Create Subscribers
+    pcl_sub = rospy.Subscriber("/pr2/world/points", pc2.PointCloud2, pcl_callback, queue_size = 1)
 
     # TODO: Create Publishers
+    pcl_test_pub = rospy.Publisher("/test_cloud", PointCloud2, queue_size=1)
 
     # TODO: Load Model From disk
+    model = pickle.load(open('model_75.sav', 'rb'))
+    clf = model['classifier']
+    encoder = LabelEncoder()
+    encoder.classes_ = model['classes']
+    scaler = model['scaler']
 
     # Initialize color_list
     get_color_list.color_list = []
 
     # TODO: Spin while node is not shutdown
+    while not rospy.is_shutdown():
+        rospy.spin()
