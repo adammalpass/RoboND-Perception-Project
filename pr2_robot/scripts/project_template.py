@@ -52,19 +52,40 @@ def pcl_callback(pcl_msg):
 
 # Exercise-2 TODOs:
 
-    # TODO: Convert ROS msg to PCL data
+    ############### TODO: Convert ROS msg to PCL data ########################
     cloud = ros_to_pcl(pcl_msg)
     
-    # TODO: Statistical Outlier Filtering
+    ############### TODO: Statistical Outlier Filtering #####################
     fil = cloud.make_statistical_outlier_filter()
     fil.set_mean_k(10)
     fil.set_std_dev_mul_thresh(1.0)
     filtered_cloud = fil.filter()
 
-    # TODO: Voxel Grid Downsampling
-    vox = cloud.make_voxel_grid_filter()
+    ############### TODO: Voxel Grid Downsampling ############################
+    vox = filtered_cloud.make_voxel_grid_filter()
 
-    # TODO: PassThrough Filter
+    # Choose a voxel (also known as leaf) size
+    LEAF_SIZE = 0.005
+
+    # Set the voxel (or leaf) size  
+    vox.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
+
+    # Call the filter function to obtain the resultant downsampled point cloud
+    cloud_vox = vox.filter()
+
+    #################### TODO: PassThrough Filter ###########################
+    # Create a PassThrough filter object.
+    passthrough = cloud_vox.make_passthrough_filter()
+
+    # Assign axis and range to the passthrough filter object.
+    filter_axis = 'z'
+    passthrough.set_filter_field_name(filter_axis)
+    axis_min = 0.5
+    axis_max = 1.3
+    passthrough.set_filter_limits(axis_min, axis_max)
+
+    # Finally use the filter function to obtain the resultant point cloud. 
+    cloud_passthrough = passthrough.filter()
 
     # TODO: RANSAC Plane Segmentation
 
@@ -77,7 +98,7 @@ def pcl_callback(pcl_msg):
     # TODO: Convert PCL data to ROS messages
 
     # TODO: Publish ROS messages
-    pcl_test_pub.publish(pcl_to_ros(filtered_cloud))
+    pcl_test_pub.publish(pcl_to_ros(cloud_passthrough))
 
 # Exercise-3 TODOs:
 
