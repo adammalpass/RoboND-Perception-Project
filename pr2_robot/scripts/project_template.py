@@ -23,6 +23,7 @@ from std_msgs.msg import String
 from pr2_robot.srv import *
 from rospy_message_converter import message_converter
 import yaml
+import pcl
 
 
 # Helper function to get surface normals
@@ -55,6 +56,10 @@ def pcl_callback(pcl_msg):
     cloud = ros_to_pcl(pcl_msg)
     
     # TODO: Statistical Outlier Filtering
+    fil = cloud.make_statistical_outlier_filter()
+    fil.set_mean_k(10)
+    fil.set_std_dev_mul_thresh(1.0)
+    filtered_cloud = fil.filter()
 
     # TODO: Voxel Grid Downsampling
     vox = cloud.make_voxel_grid_filter()
@@ -72,6 +77,7 @@ def pcl_callback(pcl_msg):
     # TODO: Convert PCL data to ROS messages
 
     # TODO: Publish ROS messages
+    pcl_test_pub.publish(pcl_to_ros(filtered_cloud))
 
 # Exercise-3 TODOs:
 
@@ -92,10 +98,10 @@ def pcl_callback(pcl_msg):
     # Suggested location for where to invoke your pr2_mover() function within pcl_callback()
     # Could add some logic to determine whether or not your object detections are robust
     # before calling pr2_mover()
-    try:
-        pr2_mover(detected_objects_list)
-    except rospy.ROSInterruptException:
-        pass
+    #try:
+    #    pr2_mover(detected_objects_list)
+    #except rospy.ROSInterruptException:
+    #    pass
 
 # function to load parameters and request PickPlace service
 def pr2_mover(object_list):
@@ -148,11 +154,11 @@ if __name__ == '__main__':
     pcl_test_pub = rospy.Publisher("/test_cloud", PointCloud2, queue_size=1)
 
     # TODO: Load Model From disk
-    model = pickle.load(open('model_75.sav', 'rb'))
-    clf = model['classifier']
-    encoder = LabelEncoder()
-    encoder.classes_ = model['classes']
-    scaler = model['scaler']
+    #model = pickle.load(open('model_75.sav', 'rb'))
+    #clf = model['classifier']
+    #encoder = LabelEncoder()
+    #encoder.classes_ = model['classes']
+    #scaler = model['scaler']
 
     # Initialize color_list
     get_color_list.color_list = []
