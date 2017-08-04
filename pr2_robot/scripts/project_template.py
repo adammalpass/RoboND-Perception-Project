@@ -80,25 +80,52 @@ def pcl_callback(pcl_msg):
     # Assign axis and range to the passthrough filter object.
     filter_axis = 'z'
     passthrough.set_filter_field_name(filter_axis)
-    axis_min = 0.5
+    axis_min = 0.6
     axis_max = 1.3
     passthrough.set_filter_limits(axis_min, axis_max)
 
     # Finally use the filter function to obtain the resultant point cloud. 
     cloud_passthrough = passthrough.filter()
 
-    # TODO: RANSAC Plane Segmentation
+    ################## TODO: RANSAC Plane Segmentation #########################
 
-    # TODO: Extract inliers and outliers
+    # Create the segmentation object
+    seg = cloud_passthrough.make_segmenter()
+
+    # Set the model you wish to fit 
+    seg.set_model_type(pcl.SACMODEL_PLANE)
+    seg.set_method_type(pcl.SAC_RANSAC)
+
+    # Max distance for a point to be considered fitting the model
+    # Experiment with different values for max_distance 
+    # for segmenting the table
+    max_distance = 0.01
+    seg.set_distance_threshold(max_distance)
+
+    # Call the segment function to obtain set of inlier indices and model coefficients
+    inliers, coefficients = seg.segment()
+
+    ############### TODO: Extract inliers and outliers ##############################
+    # Extract inliers
+
+    cloud_table = cloud_passthrough.extract(inliers, negative=False)
+
+    # Extract outliers
+    cloud_objects = cloud_passthrough.extract(inliers, negative=True)
 
     # TODO: Euclidean Clustering
 
     # TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately
 
     # TODO: Convert PCL data to ROS messages
+    ros_cloud_objects = pcl_to_ros(cloud_objects)
+    ros_cloud_table = pcl_to_ros(cloud_table)
+    #ros_cluster_cloud = pcl_to_ros(cluster_cloud)
 
     # TODO: Publish ROS messages
-    pcl_test_pub.publish(pcl_to_ros(cloud_passthrough))
+    pcl_objects_pub.publish(ros_cloud_objects)
+    pcl_table_pub.publish(ros_cloud_table)
+    #pcl_cluster_pub.publish(ros_cluster_cloud)
 
 # Exercise-3 TODOs:
 
@@ -172,7 +199,10 @@ if __name__ == '__main__':
     pcl_sub = rospy.Subscriber("/pr2/world/points", pc2.PointCloud2, pcl_callback, queue_size = 1)
 
     # TODO: Create Publishers
-    pcl_test_pub = rospy.Publisher("/test_cloud", PointCloud2, queue_size=1)
+    #pcl_test_pub = rospy.Publisher("/test_cloud", PointCloud2, queue_size=1)
+    pcl_objects_pub = rospy.Publisher("/pcl_objects", PointCloud2, queue_size = 1)
+    pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size = 1)
+    #pcl_cluster_pub = rospy.Publisher("/pcl_cluster", PointCloud2, queue_size = 1)
 
     # TODO: Load Model From disk
     #model = pickle.load(open('model_75.sav', 'rb'))
