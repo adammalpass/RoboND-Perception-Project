@@ -87,6 +87,19 @@ def pcl_callback(pcl_msg):
     # Finally use the filter function to obtain the resultant point cloud. 
     cloud_passthrough = passthrough.filter()
 
+    # Create a PassThrough filter object.
+    passthrough = cloud_passthrough.make_passthrough_filter()
+
+    # Assign axis and range to the passthrough filter object.
+    filter_axis = 'y'
+    passthrough.set_filter_field_name(filter_axis)
+    axis_min = -0.5
+    axis_max = 0.5
+    passthrough.set_filter_limits(axis_min, axis_max)
+
+    # Finally use the filter function to obtain the resultant point cloud. 
+    cloud_passthrough = passthrough.filter()
+
     ################## TODO: RANSAC Plane Segmentation #########################
 
     # Create the segmentation object
