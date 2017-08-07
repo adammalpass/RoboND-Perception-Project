@@ -57,8 +57,8 @@ def pcl_callback(pcl_msg):
     
     ############### TODO: Statistical Outlier Filtering #####################
     fil = cloud.make_statistical_outlier_filter()
-    fil.set_mean_k(10)
-    fil.set_std_dev_mul_thresh(1.0)
+    fil.set_mean_k(20)
+    fil.set_std_dev_mul_thresh(0.3)
     filtered_cloud = fil.filter()
 
     ############### TODO: Voxel Grid Downsampling ############################
@@ -138,7 +138,7 @@ def pcl_callback(pcl_msg):
     # Your task is to experiment and find values that work for segmenting objects.
     ec.set_ClusterTolerance(0.015)
     ec.set_MinClusterSize(20)
-    ec.set_MaxClusterSize(2500)
+    ec.set_MaxClusterSize(3000)
     # Search the k-d tree for clusters
     ec.set_SearchMethod(tree)
     # Extract indices for each of the discovered clusters
@@ -279,6 +279,7 @@ if __name__ == '__main__':
     detected_objects_pub = rospy.Publisher("/detected_objects", DetectedObjectsArray, queue_size = 1)
 
     # TODO: Load Model From disk
+    #model = pickle.load(open('backup/model_0.67.sav', 'rb'))
     model = pickle.load(open('model.sav', 'rb'))
     clf = model['classifier']
     encoder = LabelEncoder()
