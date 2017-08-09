@@ -226,6 +226,8 @@ def pcl_callback(pcl_msg):
 def pr2_mover(object_list):
 
     # TODO: Initialize variables
+    dict_list = []
+    centroids = [] # to be list of tuples (x, y, z)
 
     # TODO: Get/Read parameters
     object_list_param = rospy.get_param('/object_list')
@@ -234,29 +236,42 @@ def pr2_mover(object_list):
 
     # TODO: Rotate PR2 in place to capture side tables for the collision map
 
-    dict_list = []
-
     # TODO: Loop through the pick list
     for obj in object_list_param:
-        print(obj)
+        
 
         # TODO: Get the PointCloud for a given object and obtain it's centroid
+        object_name = String()
+        object_name.data = obj['name']
+        #print(object_list[object_name])
 
-        # TODO: Create 'place_pose' for the object
+        #print(object_name)
+        for detected_object in object_list:
+            if detected_object.label == object_name.data:
+                #print(object_name)
+
+                # TODO: Create 'place_pose' for the object
+                #labels.append(object.label)
+                points_arr = ros_to_pcl(detected_object.cloud).to_array()
+                #centroids.append(np.mean(points_arr, axis=0)[:3])
+                pick_pose = np.mean(points_arr, axis=0)[:3]
+                print(pick_pose)
 
         # TODO: Assign the arm to be used for pick_place
+        arm_name = String()
         if obj['group'] == 'red':
-            arm_name = 'left'
+            arm_name.data = 'left'
         elif obj['group'] == 'green':
-            arm_name = 'right'
+            arm_name.data = 'right'
         else:
             print "ERROR, group must be green or red!"
 
-        object_name = obj['name']
 
         # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
-        test_scene_num = 1
-        place_pose = 0 #Not used yet for initial project submisson
+        test_scene_num = Int32()
+        test_scene_num.data = 1
+
+        place_pose = pick_pose #Not used yet for initial project submisson
         dict_list.append(make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose))
 
         # Wait for 'pick_place_routine' service to come up
