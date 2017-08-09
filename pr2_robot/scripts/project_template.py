@@ -245,6 +245,11 @@ def pr2_mover(object_list):
         object_name.data = obj['name']
         #print(object_list[object_name])
 
+        #set default value of pick_pose in case the object can't be found
+        pick_pose = Pose()
+        pick_pose.position = [0, 0, 0]
+        pick_pose.orientation = [0,0,0,0]
+
         #print(object_name)
         for detected_object in object_list:
             if detected_object.label == object_name.data:
@@ -254,8 +259,11 @@ def pr2_mover(object_list):
                 #labels.append(object.label)
                 points_arr = ros_to_pcl(detected_object.cloud).to_array()
                 #centroids.append(np.mean(points_arr, axis=0)[:3])
-                pick_pose = np.mean(points_arr, axis=0)[:3]
-                print(pick_pose)
+                pick_pose_np = np.mean(points_arr, axis=0)[:3]
+                pick_pose.position = [np.asscalar(pick_pose_np[0]), np.asscalar(pick_pose_np[1]), np.asscalar(pick_pose_np[2])]
+                print(pick_pose.position)
+                break
+
 
         # TODO: Assign the arm to be used for pick_place
         arm_name = String()
