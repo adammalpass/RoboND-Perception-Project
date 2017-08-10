@@ -247,8 +247,15 @@ def pr2_mover(object_list):
 
         #set default value of pick_pose in case the object can't be found
         pick_pose = Pose()
-        pick_pose.position = [0, 0, 0]
-        pick_pose.orientation = [0,0,0,0]
+        pick_pose.position.x = 0
+        pick_pose.position.y = 0
+        pick_pose.position.z = 0
+
+        #set orientation to 0
+        pick_pose.orientation.x = 0
+        pick_pose.orientation.y = 0
+        pick_pose.orientation.z = 0
+        pick_pose.orientation.w = 0
 
         #print(object_name)
         for detected_object in object_list:
@@ -260,8 +267,11 @@ def pr2_mover(object_list):
                 points_arr = ros_to_pcl(detected_object.cloud).to_array()
                 #centroids.append(np.mean(points_arr, axis=0)[:3])
                 pick_pose_np = np.mean(points_arr, axis=0)[:3]
-                pick_pose.position = [np.asscalar(pick_pose_np[0]), np.asscalar(pick_pose_np[1]), np.asscalar(pick_pose_np[2])]
-                print(pick_pose.position)
+                #pick_pose.position = [np.asscalar(pick_pose_np[0]), np.asscalar(pick_pose_np[1]), np.asscalar(pick_pose_np[2])]
+                pick_pose.position.x = np.asscalar(pick_pose_np[0])
+                pick_pose.position.y = np.asscalar(pick_pose_np[1])
+                pick_pose.position.z = np.asscalar(pick_pose_np[2])
+                #print(pick_pose.position)
                 break
 
 
