@@ -231,8 +231,15 @@ def pr2_mover(object_list):
 
     # TODO: Get/Read parameters
     object_list_param = rospy.get_param('/object_list')
+    dropbox_param = rospy.get_param('/dropbox')
 
     # TODO: Parse parameters into individual variables
+    dict_dropbox = {}
+    for p in dropbox_param:
+        dict_dropbox[p['name']] = p['position']
+
+    #print (dict_dropbox["left"])
+    #print (dict_dropbox["right"])
 
     # TODO: Rotate PR2 in place to capture side tables for the collision map
 
@@ -256,6 +263,13 @@ def pr2_mover(object_list):
         pick_pose.orientation.y = 0
         pick_pose.orientation.z = 0
         pick_pose.orientation.w = 0
+
+        #set place pose orientation to 0
+        place_pose = Pose()
+        place_pose.orientation.x = 0
+        place_pose.orientation.y = 0
+        place_pose.orientation.z = 0
+        place_pose.orientation.w = 0
 
         #print(object_name)
         for detected_object in object_list:
@@ -289,7 +303,9 @@ def pr2_mover(object_list):
         test_scene_num = Int32()
         test_scene_num.data = 1
 
-        place_pose = pick_pose #Not used yet for initial project submisson
+        place_pose.position.x = dict_dropbox[arm_name.data][0]
+        place_pose.position.y = dict_dropbox[arm_name.data][1]
+        place_pose.position.z = dict_dropbox[arm_name.data][2]
         dict_list.append(make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose))
 
         # Wait for 'pick_place_routine' service to come up
