@@ -301,7 +301,7 @@ def pr2_mover(object_list):
 
         # TODO: Create a list of dictionaries (made with make_yaml_dict()) for later output to yaml format
         test_scene_num = Int32()
-        test_scene_num.data = 1
+        test_scene_num.data = 3
 
         place_pose.position.x = dict_dropbox[arm_name.data][0]
         place_pose.position.y = dict_dropbox[arm_name.data][1]
@@ -323,7 +323,7 @@ def pr2_mover(object_list):
         #     print "Service call failed: %s"%e
 
     # TODO: Output your request parameters into output yaml file
-    yaml_filename = "output_1.yaml"
+    yaml_filename = "output_" + str(test_scene_num.data) + ".yaml"
 
     send_to_yaml(yaml_filename, dict_list)
 
